@@ -12,19 +12,10 @@ configFileLocation = os.path.join(
     os.path.dirname(__file__), "config/config.json")
 
 
-def interpret_emoji(payload, action):
+def interpret_emoji(payload):
     """
     Handle logic from both add/remove emoji reacts here. DRY you idiot.
     """
-    user = client.get_user(payload.user_id)
-    # If the user reacting is the bot, return
-    if user == client.user:
-        return
-    # If the reaction is not on the correct message for manging roles, return.
-    # Defined in config/config.json
-    if get_message_id() != payload.message_id:
-        return
-
     if payload.emoji.is_custom_emoji():
         emoji_name = f":{payload.emoji.name}:"
     else:
@@ -32,10 +23,29 @@ def interpret_emoji(payload, action):
 
     role_ID = get_role_ID(emoji_name)
 
-    print(emoji_name, role_ID)
+    for role in roles:
+        if role_ID == role.id:
+            return role
+
+    return None
+
+
+def eligible_for_action(payload):
+    user = client.get_user(payload.user_id)
+    # If the user reacting is the bot, return
+    if user == client.user:
+        return False
+    # If the reaction is not on the correct message for manging roles, return.
+    # Defined in config/config.json
+    if get_message_id() != payload.message_id:
+        return False
+    return True
 
 
 def map_emoji_ids():
+    """
+    Match Emoji ID's from the server with emojis in the config
+    """
     with open(configFileLocation, "r") as settingsFile:
         settingsData = json.load(settingsFile)
         configuredRoles = settingsData["roles"]
@@ -55,6 +65,11 @@ def map_emoji_ids():
 
 
 def role_message_exists():
+    """
+    Determine if a role message has been saved to the config
+
+    Return Bool
+    """
     with open(configFileLocation, "r") as configFile:
         configData = json.load(configFile)
         message_id = configData["role_message_id"]
@@ -65,6 +80,11 @@ def role_message_exists():
 
 
 def get_message_id():
+    """
+    Retreive the message ID saved in the config file
+
+    Return Int(message_id)
+    """
     with open(configFileLocation, "r") as configFile:
         configData = json.load(configFile)
         message_id = configData["role_message_id"]
@@ -91,6 +111,11 @@ def get_role_ID(react):
 
 
 def map_role_ID(roles):
+    """
+    Match Role ID's from the server with Role names in the config
+
+    roles = [Role objects]
+    """
     with open(configFileLocation, "r") as settingsFile:
         settingsData = json.load(settingsFile)
         configuredRoles = settingsData["roles"]
@@ -110,6 +135,12 @@ def map_role_ID(roles):
 
 
 def build_message():
+    """
+    Build the multi-line message combining reactions and descriptions
+    from the config. 
+
+    Return str(finalMessage)
+    """
     finalMessage = """\n"""
     messageLines = []
     with open(configFileLocation) as settingsFile:
@@ -128,6 +159,11 @@ def build_message():
 
 
 def get_all_reacts():
+    """
+    Get all the reaction names from the config file
+
+    Return [reacts]
+    """
     reacts = []
     with open(configFileLocation) as settingsFile:
         settingsData = json.load(settingsFile)
@@ -144,57 +180,54 @@ def get_all_reacts():
 
 @client.event
 async def on_raw_reaction_add(payload):
-    interpret_emoji(payload, "add")
-
-    role_ID = get_role_ID(emoji.demojize(str(payload.emoji)))
-    for role in roles:
-        if role_ID == role.id:
-            await payload.member.add_roles(role)
-            print(
-                f"The user {payload.member} was added to the role {role.name}")
+    if eligible_for_action(payload):
+        role = interpret_emoji(payload)
+        if role == None:
+            return
+        await payload.member.add_roles(role)
+        print(
+            f"The user {payload.member} was added to the role {role.name}")
 
 
 @client.event
 async def on_raw_reaction_remove(payload):
-    interpret_emoji(payload, "remove")
-
-    # Cycle through roles and find the role matching the reaction
-    role_ID = get_role_ID(emoji.demojize(str(payload.emoji)))
-    for role in roles:
-        if role_ID == role.id:
-            user = client.get_user(payload.user_id)
-            for member in client.get_all_members():
-                if member.id == payload.user_id:
-                    user = member
-            await user.remove_roles(role)
-            print(
-                f"The user {user.name} was removed from the role {role.name}")
+    if eligible_for_action(payload):
+        role = interpret_emoji(payload)
+        if role == None:
+            return
+        for member in client.get_all_members():
+            if member.id == payload.user_id:
+                user = member
+        await user.remove_roles(role)
+        print(
+            f"The user {user.name} was removed from the role {role.name}")
 
 
 @client.event
 async def on_ready():
     global roles, roleMessage
-    print(f"{client.user} has connected to Discord!")
+    # Set bot status in the server
     await client.change_presence(activity=botActivity)
     channel = await client.fetch_channel(channel_id=CHANNEL_ID)
+    roles = await client.guilds[0].fetch_roles()
+    map_role_ID(roles)
     map_emoji_ids()
 
     if role_message_exists():
-        print("Role message exists already. Thanks!")
         roleMessage = await channel.fetch_message(get_message_id())
         await roleMessage.edit(content=build_message())
     else:
         roleMessage = await channel.send(content=build_message())
         store_message_id(roleMessage.id)
 
+    # Remove all reactions from the bot on the message.
+    for react in roleMessage.reactions:
+        await react.remove(client.user)
+
+    # Add a reaction from the bot for each in the config
     default_reacts = get_all_reacts()
-
     for react in default_reacts:
-        print(f"Adding {emoji.emojize(react, use_aliases=True)}")
         await roleMessage.add_reaction(emoji.emojize(react, use_aliases=True))
-
-    roles = await client.guilds[0].fetch_roles()
-    map_role_ID(roles)
 
 
 client.run(TOKEN)

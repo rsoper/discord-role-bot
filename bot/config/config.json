@@ -2,72 +2,84 @@
     "roles": [
         {
             "react": ":money_with_wings:",
+            "react_id": 0,
             "role": "Inventory Hunter",
             "description": "if you want notifications from Inventory Hunter",
             "role_id": 0
         },
         {
             "react": ":valheim:",
+            "react_id": 0,
             "role": "Valheim",
             "description": "if you want to play Valheim",
             "role_id": 0
         },
         {
             "react": ":musical_note:",
+            "react_id": 0,
             "role": "Music Control",
             "description": "if you'd like to control the Groovy bot",
             "role_id": 0
         },
         {
             "react": ":military_helmet:",
+            "react_id": 0,
             "role": "Siege",
             "description": "if you want to play Rainbow 6 Siege",
             "role_id": 0
         },
         {
             "react": ":radioactive:",
+            "react_id": 0,
             "role": "Rust",
             "description": "if you want to play Rust",
             "role_id": 0
         },
         {
             "react": ":warning:",
+            "react_id": 0,
             "role": "Tarkov",
             "description": "if you want to play Escape From Tarkov",
             "role_id": 0
         },
         {
             "react": ":military_medal:",
+            "react_id": 0,
             "role": "Insurgency",
             "description": "if you want to play Insurgency",
             "role_id": 0
         },
         {
             "react": ":robot:",
+            "react_id": 0,
             "role": "Satisfactory",
             "description": "if you want to play Satisfactory",
             "role_id": 0
         },
         {
             "react": ":keyboard:",
+            "react_id": 0,
             "role": "Code",
             "description": "if you want to talk about code",
             "role_id": 0
         },
         {
             "react": ":desktop_computer:",
+            "react_id": 0,
             "role": "Hardware",
             "description": "if you want to talk about gear/hardware",
             "role_id": 0
         },
         {
             "react": ":control_knobs:",
+            "react_id": 0,
             "role": "Self Hosted",
             "description": "if you want to talk about self hosted apps",
             "role_id": 0
         },
         {
             "react": ":dna:",
+            "react_id": 0,
             "role": "Outriders",
             "description": "if you want to play Outriders",
             "role_id": 0
