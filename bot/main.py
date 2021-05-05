@@ -2,6 +2,9 @@ import os
 import discord
 import emoji
 import json
+import asyncio
+from threading import Thread
+from flask import Flask
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
@@ -10,6 +13,7 @@ client = discord.Client(intents=intents)
 botActivity = discord.Game("with the API")
 configFileLocation = os.path.join(
     os.path.dirname(__file__), "config/config.json")
+app = Flask(__name__)
 
 
 def interpret_emoji(payload):
@@ -230,4 +234,27 @@ async def on_ready():
         await roleMessage.add_reaction(emoji.emojize(react, use_aliases=True))
 
 
-client.run(TOKEN)
+# Running Flask and Discord.py through the magic of Threading.
+# Going to separate that down here for sanity sake
+
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+
+
+def admin_portal():
+    app.run()
+
+
+# Create an Async event loop as the method to start discord.py
+loop = asyncio.get_event_loop()
+loop.create_task(client.start(TOKEN))
+
+# Create and start the Flask app thread
+admin_portal_thread = Thread(target=admin_portal)
+admin_portal_thread.start()
+
+# Create and start the Discord.py loop thread. It has to be done in this order.
+# I'd be lying if I said I knew why.
+discord_bot_thread = Thread(target=loop.run_forever())
+discord_bot_thread.start()
