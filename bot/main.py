@@ -4,7 +4,7 @@ import emoji
 import json
 import asyncio
 from threading import Thread
-from flask import Flask
+from flask import Flask, request, render_template
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = os.getenv("CHANNEL_ID")
@@ -237,9 +237,21 @@ async def on_ready():
 # Running Flask and Discord.py through the magic of Threading.
 # Going to separate that down here for sanity sake
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+def read_config():
+    with open(configFileLocation) as settingsFile:
+        settingsData = json.load(settingsFile)
+        configuredRoles = settingsData["roles"] 
+        
+        print(type(configuredRoles))
+        return configuredRoles
+
+@app.route("/")
+def admin_index():
+    return render_template("admin.html", result=read_config())
+
+@app.route("/edit")
+def edit_config():
+    return render_template("edit.html")
 
 
 def admin_portal():
