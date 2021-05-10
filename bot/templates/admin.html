@@ -15,14 +15,14 @@
         <div class="row">
             <h1>Whats in the config?</h1>
         </div>
-        {% for role in result %}
+        {% for role in existing_config %}
         <div class="row align-items-center">
             <div class="col"> {{ role["react"] }} </div>
             <div class="col"> {{ role["description"] }} </div>
         </div>
         {% endfor %}
         <div>
-            <button type="button" class="btn btn-primary" onclick="">Edit</button>
+            <a href="/edit"><button type="button" class="btn btn-primary">Edit</button></a>
         </div>
     </div>
 </body>

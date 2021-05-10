@@ -15,14 +15,15 @@
         <div class="row">
             <h1>Edit the configuration</h1>
         </div>
-        {% for role in result %}
+        {% for role in existing_config %}
         <div class="row align-items-center">
-            <div class="col"> {{ role["react"] }} </div>
-            <div class="col"> {{ role["description"] }} </div>
+            <input type="text" class="col" id="{{role["role_id"]}}-react" value="{{ role["react"] }}">
+            <input type="text" class="col" id="{{role["role_id"]}}-description" value="{{ role["description"] }}">
         </div>
         {% endfor %}
         <div>
-            <button type="button" class="btn btn-primary" onclick="">Edit</button>
+            <a href="/"><button type="button" class="btn btn-primary">Cancel</button></a>
+            <button type="button" class="btn btn-primary" onclick="">Save</button>
         </div>
     </div>
 </body>

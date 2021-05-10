@@ -242,16 +242,15 @@ def read_config():
         settingsData = json.load(settingsFile)
         configuredRoles = settingsData["roles"] 
         
-        print(type(configuredRoles))
         return configuredRoles
 
 @app.route("/")
 def admin_index():
-    return render_template("admin.html", result=read_config())
+    return render_template("admin.html", existing_config=read_config())
 
 @app.route("/edit")
 def edit_config():
-    return render_template("edit.html")
+    return render_template("edit.html", existing_config=read_config())
 
 
 def admin_portal():
