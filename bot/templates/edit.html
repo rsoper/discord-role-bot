@@ -1,31 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+      crossorigin="anonymous"
+    />
 
     <title>Discord Role Bot - Edit</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <div class="row">
-            <h1>Edit the configuration</h1>
-        </div>
+      <div class="row">
+        <h1>Edit the configuration</h1>
+      </div>
+      <form name="configData" action="/save" method="POST">
         {% for role in existing_config %}
         <div class="row align-items-center">
-            <input type="text" class="col" id="{{role["role_id"]}}-react" value="{{ role["react"] }}">
-            <input type="text" class="col" id="{{role["role_id"]}}-description" value="{{ role["description"] }}">
+          <input type="text" class="col" name="{{role["role_id"]}}-react"
+          value="{{ role["react"] }}"> <input type="text" class="col"
+          name="{{role["role_id"]}}-description" value="{{ role["description"]
+          }}">
         </div>
         {% endfor %}
         <div>
-            <a href="/"><button type="button" class="btn btn-primary">Cancel</button></a>
-            <button type="button" class="btn btn-primary" onclick="">Save</button>
+          <a href="/"><button type="button" class="btn btn-primary">Cancel</button></a>
+          <button type="submit" class="btn btn-primary" onclick="">Save</button>
         </div>
+      </form>
     </div>
-</body>
-
+  </body>
 </html>
