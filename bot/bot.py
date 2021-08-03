@@ -38,7 +38,7 @@ class RoleBot(discord.Client):
         await self.role_message.edit(content=self.build_message())
         if self.eligible_for_action(payload):
             role = self.interpret_emoji(payload)
-            if role == None:
+            if role is None:
                 return
             await payload.member.add_roles(role)
             print(
@@ -47,7 +47,7 @@ class RoleBot(discord.Client):
     async def on_raw_reaction_remove(self, payload):
         if self.eligible_for_action(payload):
             role = self.interpret_emoji(payload)
-            if role == None:
+            if role is None:
                 return
             for member in self.get_all_members():
                 if member.id == payload.user_id:
@@ -63,9 +63,9 @@ class RoleBot(discord.Client):
 
         Return Bool
         """
-        with open(self.config_file_location, "r") as configFile:
-            configData = json.load(configFile)
-            message_id = configData["role_message_id"]
+        with open(self.config_file_location, "r") as config_file:
+            config_data = json.load(config_file)
+            message_id = config_data["role_message_id"]
         if message_id == 0:
             return False
         else:
@@ -77,18 +77,18 @@ class RoleBot(discord.Client):
 
         Return Int(message_id)
         """
-        with open(self.config_file_location, "r") as configFile:
-            configData = json.load(configFile)
-            message_id = configData["role_message_id"]
+        with open(self.config_file_location, "r") as config_file:
+            config_data = json.load(config_file)
+            message_id = config_data["role_message_id"]
         return message_id
 
     def store_message_id(self, message_id):
-        with open(self.config_file_location, "r") as configFile:
-            configData = json.load(configFile)
+        with open(self.config_file_location, "r") as config_file:
+            config_data = json.load(config_file)
 
-        configData["role_message_id"] = message_id
-        with open(self.config_file_location, "w") as configFile:
-            json.dump(configData, configFile, indent=4)
+        config_data["role_message_id"] = message_id
+        with open(self.config_file_location, "w") as config_file:
+            json.dump(config_data, config_file, indent=4)
 
     def build_message(self):
         """
@@ -99,17 +99,17 @@ class RoleBot(discord.Client):
         """
         final_message = """\n"""
         message_lines = []
-        with open(self.config_file_location) as settingsFile:
-            settingsData = json.load(settingsFile)
-            configuredRoles = settingsData["roles"]
+        with open(self.config_file_location) as config_file:
+            config_data = json.load(config_file)
+            configured_roles = config_data["roles"]
 
-        for item in configuredRoles:
+        for item in configured_roles:
             react = item["react"]
             for custom_emoji in self.emojis:
                 if custom_emoji.name in react:
                     react = f"<{item['react']}{item['react_id']}>"
-            roleDescription = item["description"]
-            message_lines.append(f"React {react} {roleDescription}")
+            role_description = item["description"]
+            message_lines.append(f"React {react} {role_description}")
 
         return final_message.join(message_lines)
 
@@ -117,11 +117,11 @@ class RoleBot(discord.Client):
         """
         Match Role ID's from the server with Role names in the config
         """
-        with open(self.config_file_location, "r") as settingsFile:
-            settingsData = json.load(settingsFile)
-            configuredRoles = settingsData["roles"]
+        with open(self.config_file_location, "r") as config_file:
+            config_data = json.load(config_file)
+            configured_roles = config_data["roles"]
 
-        for item in configuredRoles:
+        for item in configured_roles:
             if item["role_id"] == 0:
                 for role in self.roles:
                     if role.name == item["role"]:
@@ -129,20 +129,20 @@ class RoleBot(discord.Client):
             else:
                 continue
 
-        settingsData["roles"] = configuredRoles
+        config_data["roles"] = configured_roles
 
-        with open(self.config_file_location, "w") as configFile:
-            json.dump(settingsData, configFile, indent=4)
+        with open(self.config_file_location, "w") as config_file:
+            json.dump(config_data, config_file, indent=4)
 
     def map_emoji_ids(self):
         """
         Match Emoji ID's from the server with emojis in the config
         """
-        with open(self.config_file_location, "r") as settingsFile:
-            settingsData = json.load(settingsFile)
-            configuredRoles = settingsData["roles"]
+        with open(self.config_file_location, "r") as config_file:
+            config_data = json.load(config_file)
+            configured_roles = config_data["roles"]
 
-        for item in configuredRoles:
+        for item in configured_roles:
             if item["react_id"] == 0:
                 for custom_emoji in self.emojis:
                     if custom_emoji.name in item["react"]:
@@ -150,10 +150,10 @@ class RoleBot(discord.Client):
             else:
                 continue
 
-        settingsData["roles"] = configuredRoles
+        config_data["roles"] = configured_roles
 
-        with open(self.config_file_location, "w") as configFile:
-            json.dump(settingsData, configFile, indent=4)
+        with open(self.config_file_location, "w") as config_file:
+            json.dump(config_data, config_file, indent=4)
 
     def get_all_reacts(self):
         """
@@ -162,11 +162,11 @@ class RoleBot(discord.Client):
         Return [reacts]
         """
         reacts = []
-        with open(self.config_file_location) as settingsFile:
-            settingsData = json.load(settingsFile)
-            configuredRoles = settingsData["roles"]
+        with open(self.config_file_location) as config_file:
+            config_data = json.load(config_file)
+            configured_roles = config_data["roles"]
 
-        for item in configuredRoles:
+        for item in configured_roles:
             if item["react_id"] != 0:
                 reacts.append(f"<{item['react']}{item['react_id']}>")
             else:
@@ -174,7 +174,6 @@ class RoleBot(discord.Client):
 
         return reacts
 
-    
     def interpret_emoji(self, payload):
         """
         Handle logic from both add/remove emoji reacts here. DRY you idiot.
@@ -184,16 +183,20 @@ class RoleBot(discord.Client):
         else:
             emoji_name = emoji.demojize(payload.emoji.name)
 
-        role_ID = self.get_role_id(emoji_name)
+        role_id = self.get_role_id(emoji_name)
 
         for role in self.roles:
-            if role_ID == role.id:
+            if role_id == role.id:
                 return role
 
         return None
 
-
     def eligible_for_action(self, payload):
+        """
+        Determine if a given payload is eligible to be acted on
+
+        Return Bool
+        """
         # Update role and emoji ID info
         self.map_role_id()
         self.map_emoji_ids()
@@ -210,16 +213,15 @@ class RoleBot(discord.Client):
 
     def get_role_id(self, react):
         react = emoji.demojize(react)
-        with open(self.config_file_location, "r") as configFile:
-            configData = json.load(configFile)
-            configuredRoles = configData["roles"]
-        for item in configuredRoles:
+        with open(self.config_file_location, "r") as config_file:
+            config_data = json.load(config_file)
+            configured_roles = config_data["roles"]
+        for item in configured_roles:
             if item["react"] == react:
                 return item["role_id"]
 
 
 if __name__ in "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
-
     bot = RoleBot(intents=discord.Intents.all())
     bot.run(TOKEN)
