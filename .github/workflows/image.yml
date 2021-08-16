@@ -3,7 +3,7 @@ name: Build multi-architecture images
 on:
   push:
     branches:
-      - ghcr
+      - main
     tags:        
       - v*
 
