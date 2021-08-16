@@ -23,7 +23,7 @@ jobs:
             --tag richardsoper/discord-role-bot:latest \
             --platform linux/amd64,linux/arm64 . 
       - name: login to ghcr
-        run: echo "${{ secrets.GITHUB_PASSWORD }}" | docker login ghcr.io -u "${{ secrets.GITHUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.GHCR_PASSWORD }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
       - name: build and push to ghcr
         run: |
           docker buildx build --push \
