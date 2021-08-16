@@ -3,7 +3,7 @@ name: Build multi-architecture images
 on:
   push:
     branches:
-      - build-enhance
+      - main
     tags:        
       - v*
 
@@ -18,7 +18,6 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          # list of Docker images to use as base name for tags
           images: |
             richardsoper/discord-role-bot
             ghcr.io/${{ github.repository }}
