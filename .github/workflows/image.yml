@@ -17,8 +17,15 @@ jobs:
           version: latest
       - name: login to docker hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-      - name: build the images
+      - name: build and push to docker hub
         run: |
           docker buildx build --push \
             --tag richardsoper/discord-role-bot:latest \
             --platform linux/amd64,linux/arm64 . 
+      - name: login to ghcr
+        run: echo "${{ secrets.GHCR_PASSWORD }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
+      - name: build and push to ghcr
+        run: |
+          docker buildx build --push \
+            --tag ghcr.io/rsoper/discord-role-bot:latest \
+            --platform linux/amd64,linux/arm64 .
